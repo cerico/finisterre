@@ -1,5 +1,4 @@
 # For use with rails and sergey playbooks
-app_directory: '~/Desktop'
 remote_domain: 'example.com'
 server: ''
 
