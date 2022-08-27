@@ -1,0 +1,217 @@
+---
+- name: This is a hello-world example
+  hosts: localhost
+  connection: local 
+
+  vars_prompt:
+    - name: app_name
+      prompt: What is your app_name?
+      private: no
+
+  vars_files:
+    - config
+
+  vars:
+    app_location: "{{ app_directory | default('~') }}/{{ app_name }}"
+    url: "{{ app_name }}.{{ remote_domain | default('example.com') }}"
+
+  tasks:
+    - name: check for rails app
+      stat: path={{ app_location }}
+      register: rails
+
+    - name: exit if rails app already exists with this name
+      fail: msg="This rails app already exists - edit vars with new info"
+      when: rails.stat.exists
+
+    - name: rails new {{ rails_version }}.
+      command: "rails {{ rails_version }} new {{ app_location }} --database=postgresql --skip-coffee"
+
+    - name: makefile
+      copy:
+        src: "{{ item }}"
+        dest: "{{ app_location }}"
+      with_items:
+        - Makefile  
+        - babel.config.js 
+        
+    - name: react component
+      copy:
+        src: react/yay.js
+        dest: "{{ app_location }}/app/javascript/yay.js"
+
+    - name: react setup
+      copy:
+        src: react/pack.js
+        dest: "{{ app_location }}/app/javascript/packs/application.js"
+
+    - name: rails controller
+      copy:
+        src: rails/controller.rb
+        dest: "{{ app_location }}/app/controllers/react_controller.rb"
+
+    - name: Creates react erb directory
+      file:
+        path: "{{ app_location }}/app/views/react"
+        state: directory
+
+    - name: react erb
+      copy:
+        src: rails/index.html.erb
+        dest: "{{ app_location }}/app/views/react/index.html.erb"
+
+    - name: routes
+      copy:
+        src: rails/routes.rb
+        dest: "{{ app_location }}/config/routes.rb"
+
+    - name: Copy ansible deploy stuff
+      copy:
+        src: "{{ item }}"
+        dest: "{{ app_location }}/.deploy"
+      with_items:
+      - deploy_tasks
+      - roles
+      - templates
+      - ansible.cfg
+      - deploy.yml
+      - setup.yml
+      - ci.yml
+
+    - name: vars
+      template:
+        src: app-vars.yml.j2
+        dest: "{{ app_location }}/.deploy/app-vars.yml"
+
+    - name: requirements
+      copy:
+        src: requirements.yml
+        dest: "{{ app_location }}/.deploy/requirements.yml"
+
+    - name: Creates directory
+      file:
+        path: "{{ app_location }}/.github/workflows"
+        state: directory
+
+    - name: Creates template directory
+      file:
+        path: "{{ app_location }}/.deploy/files"
+        state: directory
+
+    - name: githubactions
+      template:
+        src: github.yml.j2
+        dest: "{{ app_location }}/.deploy/files/deploy.yml"
+
+    - name: success file
+      copy:
+        src: success.html
+        dest: "{{ app_location }}/public/success.html"
+
+    - name: favicon
+      copy:
+        src: favicon.ico
+        dest: "{{ app_location }}/public/favicon.ico"
+
+    - name: hosts
+      template:
+        src: hosts.ini.j2
+        dest: "{{ app_location }}/.deploy/hosts.ini"
+
+    - name: package.json
+      template:
+        src: package.json.j2
+        dest: "{{ app_location }}/package.json"
+
+    - name: Ansible master key
+      shell: "echo master_key: $(cat {{ app_location }}/config/master.key) >> {{ app_location }}/.deploy/secrets"
+
+    - name: Ansible db_password
+      shell: "echo db_password: $(cat {{ app_location }}/config/master.key) >> {{ app_location }}/.deploy/secrets"
+
+    - name: Ansible gitignore
+      shell: "echo .deploy/secrets >> {{ app_location }}/.gitignore"
+
+    - name: bundle install
+      command: bundle install
+      args:
+        chdir: "{{ app_location }}"
+
+    - name: add gems
+      command: bundle add {{ item }}
+      args:
+        chdir: "{{ app_location }}"
+      with_items:
+        - react-rails
+        - omniauth-google-oauth2
+        - omniauth-rails_csrf_protection
+        - dotenv-rails
+
+    - name: yarn
+      command: yarn
+      args:
+        chdir: "{{ app_location }}"
+
+    - name: rails into readme
+      command: ./bin/rails -v
+      args:
+        chdir: "{{ app_location }}"
+      register: rails_version
+
+    - name: Running pending migrations
+      command: ./bin/rake db:create
+      args:
+        chdir: "{{ app_location }}"
+
+    - name: Running pending migrations
+      command: ./bin/rake db:migrate
+      args:
+        chdir: "{{ app_location }}"
+
+    - name: readme
+      template:
+        src: readme.md.j2
+        dest: "{{ app_location }}/README.md"
+
+    - name: git add
+      command: git add . 
+      args:
+        chdir: "{{ app_location }}"
+
+    - name: git commit 
+      command: git commit -m first
+      args:
+        chdir: "{{ app_location }}"
+
+    - name: git main
+      command: git branch -m main
+      args:
+        chdir: "{{ app_location }}"
+
+    - name: print app location.
+      shell: "echo {{ app_location }} > location"
+
+    - name: Creates storybook directory
+      file:
+        path: "{{ app_location }}/.storybook"
+        state: directory
+
+    - name: Creates storybook files
+      copy:
+        src: "{{ item }}"
+        dest: "{{ app_location }}/.storybook"
+      with_items:
+        - storybook/main.js
+        - storybook/preview.js
+
+    - name: Creates stories directory
+      file:
+        path: "{{ app_location }}/stories"
+        state: directory
+
+    - name: touch gitkeep
+      file:
+        path: "{{ app_location }}/stories/.gitkeep"
+        state: touch
+        modification_time: preserve
+        access_time: preserve

@@ -1,0 +1,44 @@
+---
+- name: Deploy our Rails app
+  hosts: all
+  become: true
+  become_user: "{{ deploy_user }}"
+
+  vars_files:
+    - app-vars.yml
+
+  pre_tasks:    
+    - name: Upload shared files
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ app_shared_path }}/{{ item.dest }}"
+        owner: "{{ deploy_user }}" 
+        group: "{{ deploy_group }}"
+      with_items: "{{ shared_files_to_copy }}"
+      tags:
+        - copy
+
+  tasks:
+    - name: ssh
+      shell: "ssh -t root@io37.ch 'ls'"
+
+    - name: ssh ii
+      shell: "ssh -t deploy@io37.ch 'ls'"
+
+  roles:
+    - role: ansistrano.deploy
+    
+    - role: puma
+      tags: puma
+      become: true
+      become_user: root
+  
+  tasks:
+    - name: stop nginx
+      become: true
+      become_user: root
+      shell: "nginx -s stop"
+    - name: certify
+      become: true
+      become_user: root
+      shell: "certbot --nginx -n --agree-tos --email {{ email }} -d {{ url }}"

@@ -1,0 +1,16 @@
+# For use with rails and sergey playbooks
+app_directory: '~/Desktop'
+remote_domain: 'example.com'
+server: ''
+
+email: ''
+
+deploy_user_public_key_local_path: '~/.ssh/deploy_rsa.pub'
+root_user_public_key_local_path: '~/.ssh/root_rsa.pub'
+
+ruby_version: '2.7.4'
+deploy_user: '{{ deploy_user }}'
+postgresql_version: '13'
+postgresql_locales:
+  - 'en_US.UTF-8'
+  - 'en_GB.UTF-8'

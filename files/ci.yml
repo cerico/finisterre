@@ -1,0 +1,10 @@
+---
+- name: This is a hello-world example
+  hosts: localhost
+  connection: local
+
+  tasks:
+    - name: gh action
+      copy:
+        src: deploy.yml
+        dest: "{{ playbook_dir }}/../.github/workflows/deploy.yml"
