@@ -2,7 +2,7 @@
 
 This Ansible playbook sets up
 
-- Ruby on Rails + React application.
+- Ruby on Rails, React, & Storybook application.
 - Pre-configred Ansible playbook for deployment as github action
 
 ### How to run
