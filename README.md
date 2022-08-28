@@ -49,7 +49,6 @@ railsn () {
 This can then be run simply with `railsn` and the app will be set up in the current directory
 
 <img width="520" alt="image" src="https://user-images.githubusercontent.com/4191428/187072594-fedff1b3-9865-46ce-9dcf-7db9b3d8c143.png">
-a
-<img width="520" alt="image" src="https://user-images.githubusercontent.com/4191428/187072601-1813d1db-7b68-49a0-8f7d-1f8c27166b69.png>
+<img width="520" alt="image" src="https://user-images.githubusercontent.com/4191428/187072601-1813d1db-7b68-49a0-8f7d-1f8c27166b69.png">
 
 
