@@ -5,10 +5,6 @@ This Ansible playbook sets up
 - Ruby on Rails + React application.
 - Pre-configred Ansible playbook for deployment as github action
 
-1![image](https://user-images.githubusercontent.com/4191428/187072594-fedff1b3-9865-46ce-9dcf-7db9b3d8c143.png)
-Untitled 2![image](https://user-images.githubusercontent.com/4191428/187072601-1813d1db-7b68-49a0-8f7d-1f8c27166b69.png)
-
-
 ### How to run
 
 Edit `config` with your details
@@ -51,4 +47,7 @@ railsn () {
 ```
 
 This can then be run simply with `railsn` and the app will be set up in the current directory
+
+[image](https://user-images.githubusercontent.com/4191428/187072594-fedff1b3-9865-46ce-9dcf-7db9b3d8c143.png)
+[image](https://user-images.githubusercontent.com/4191428/187072601-1813d1db-7b68-49a0-8f7d-1f8c27166b69.png)
 
